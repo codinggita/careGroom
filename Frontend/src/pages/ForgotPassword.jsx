@@ -25,6 +25,36 @@ const ForgotPassword = () => {
     }, 1500);
   };
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+    exit: {
+      opacity: 0,
+      x: -20,
+      transition: { duration: 0.3 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 100,
+        damping: 15
+      }
+    },
+  };
+
   return (
     <div style={s.page}>
       <style>{`
@@ -43,7 +73,12 @@ const ForgotPassword = () => {
 
       {/* ─── LEFT PANEL: Image ─── */}
       <div style={s.leftPanel}>
-        <img src={resetBg} alt="Spa" style={s.bgImage} />
+        <motion.img 
+          initial={{ scale: 1.1, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          src={resetBg} alt="Spa" style={s.bgImage} 
+        />
       </div>
 
       {/* ─── RIGHT PANEL: Form ─── */}
@@ -53,25 +88,29 @@ const ForgotPassword = () => {
             {!isSubmitted ? (
               <motion.div
                 key="form"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.5 }}
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
               >
                 {/* Brand Logo */}
-                <div style={s.brand}>
+                <motion.div variants={itemVariants} style={s.brand}>
                   <h3 style={s.brandText}>CareGroom</h3>
-                </div>
+                </motion.div>
 
                 {/* Heading */}
-                <h1 style={s.heading}>Reset Password</h1>
-                <p style={s.subheading}>
+                <motion.h1 variants={itemVariants} style={s.heading}>Reset Password</motion.h1>
+                <motion.p variants={itemVariants} style={s.subheading}>
                   Enter the email address associated with your account, and we'll send you a secure link to reset your password.
-                </p>
+                </motion.p>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} style={s.form}>
-                  <div style={s.inputGroup}>
+                <motion.form 
+                  onSubmit={handleSubmit} 
+                  style={s.form}
+                  variants={containerVariants}
+                >
+                  <motion.div variants={itemVariants} style={s.inputGroup}>
                     <label style={s.label}>EMAIL ADDRESS</label>
                     <div style={{
                       ...s.inputWrapper,
@@ -98,9 +137,12 @@ const ForgotPassword = () => {
                         spellCheck="false"
                       />
                     </div>
-                  </div>
+                  </motion.div>
 
-                  <button
+                  <motion.button
+                    variants={itemVariants}
+                    whileHover={{ scale: 1.01, backgroundColor: '#C4955A' }}
+                    whileTap={{ scale: 0.99 }}
                     type="submit"
                     disabled={isLoading}
                     style={s.button}
@@ -110,36 +152,49 @@ const ForgotPassword = () => {
                         SEND RESET LINK <ArrowRight size={16} />
                       </>
                     )}
-                  </button>
-                </form>
+                  </motion.button>
+                </motion.form>
 
                 {/* Back Link */}
-                <div style={s.footer}>
-                  <Link to="/auth" style={s.backLink}>
-                    <ArrowLeft size={14} /> BACK TO LOGIN
-                  </Link>
-                </div>
+                <motion.div variants={itemVariants} style={s.footer}>
+                  <motion.div
+                    whileHover={{ x: -4 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                  >
+                    <Link to="/auth" style={s.backLink}>
+                      <ArrowLeft size={14} /> BACK TO LOGIN
+                    </Link>
+                  </motion.div>
+                </motion.div>
               </motion.div>
             ) : (
               <motion.div
                 key="success"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 20 }}
                 style={s.successCard}
               >
-                <div style={s.successIcon}>
+                <motion.div 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 10 }}
+                  style={s.successIcon}
+                >
                   <CheckCircle size={48} color={GOLD} />
-                </div>
+                </motion.div>
                 <h2 style={s.heading}>Email Sent</h2>
                 <p style={s.subheading}>
                   We've sent a password reset link to <strong>{email}</strong>. Please check your inbox.
                 </p>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setIsSubmitted(false)}
                   style={s.button}
                 >
                   <RotateCcw size={16} /> RESEND EMAIL
-                </button>
+                </motion.button>
                 <div style={s.footer}>
                   <Link to="/auth" style={s.backLink}>
                     <ArrowLeft size={14} /> BACK TO LOGIN
