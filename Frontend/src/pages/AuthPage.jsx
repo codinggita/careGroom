@@ -87,6 +87,36 @@ const AuthPage = () => {
   });
   const [errors, setErrors] = useState({});
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+    exit: {
+      opacity: 0,
+      x: -20,
+      transition: { duration: 0.3 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 100,
+        damping: 15
+      }
+    },
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
@@ -130,21 +160,44 @@ const AuthPage = () => {
 
       {/* ═══ LEFT PANEL ═══ */}
       <div style={s.left}>
-        <img src={spaAuthBg} alt="" style={s.leftImg} />
+        <motion.img 
+          initial={{ scale: 1.1, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          src={spaAuthBg} alt="" style={s.leftImg} 
+        />
         <div style={s.leftOverlay} />
-        <Link to="/" style={s.backToHome}>
-          <ArrowLeft size={15} /> Back to Home
-        </Link>
-        <div style={s.logo}>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <Link to="/" style={s.backToHome}>
+            <ArrowLeft size={15} /> Back to Home
+          </Link>
+        </motion.div>
+        
+        <motion.div 
+          style={s.logo}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.8 }}
+        >
           <span style={s.logoText}>CareGroom</span>
-        </div>
-        <div style={s.quote}>
+        </motion.div>
+
+        <motion.div 
+          style={s.quote}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 1 }}
+        >
           <p style={s.quoteText}>
             "Precision is not just a skill; it's an art form.
             Welcome to the sanctuary of self-care."
           </p>
-          <p style={s.quoteAuthor}>— The CareGroom Philosophy</p>
-        </div>
+          <p style={s.quoteAuthor}>— THE CAREGROOM PHILOSOPHY</p>
+        </motion.div>
       </div>
 
       {/* ═══ RIGHT PANEL ═══ */}
@@ -153,80 +206,109 @@ const AuthPage = () => {
           <AnimatePresence mode="wait">
             <motion.div
               key={isLogin ? 'login' : 'signup'}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.4 }}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
             >
-              <h1 style={s.heading}>{isLogin ? 'Welcome Back' : 'Create Account'}</h1>
-              <p style={s.subheading}>
+              <motion.h1 
+                variants={itemVariants}
+                style={s.heading}
+              >
+                {isLogin ? 'Welcome Back' : 'Create Account'}
+              </motion.h1>
+              <motion.p 
+                variants={itemVariants}
+                style={s.subheading}
+              >
                 {isLogin ? 'Sign in to access your sanctuary.' : 'Join CareGroom and start your journey.'}
-              </p>
+              </motion.p>
 
-              <div style={s.roleSwitcher}>
+              <motion.div variants={itemVariants} style={s.roleSwitcher}>
                 {roles.map((r) => (
-                  <button
+                  <motion.button
                     key={r.key}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => setRole(r.key)}
                     style={{ ...s.roleBtn, ...(role === r.key ? s.roleBtnActive : {}) }}
                   >
                     {r.label}
-                  </button>
+                  </motion.button>
                 ))}
-              </div>
+              </motion.div>
 
-              <form onSubmit={handleSubmit} style={s.form}>
+              <motion.form 
+                onSubmit={handleSubmit} 
+                style={s.form}
+                variants={containerVariants}
+              >
                 {!isLogin && (
-                  <InputField 
-                    icon={User} label="Full Name" name="fullName" placeholder="John Doe"
-                    value={formData.fullName} onChange={handleInputChange} 
-                    onFocus={setFocusedField} onBlur={setFocusedField}
-                    focused={focusedField === 'fullName'} error={errors.fullName}
-                  />
+                  <motion.div variants={itemVariants}>
+                    <InputField 
+                      icon={User} label="Full Name" name="fullName" placeholder="John Doe"
+                      value={formData.fullName} onChange={handleInputChange} 
+                      onFocus={setFocusedField} onBlur={setFocusedField}
+                      focused={focusedField === 'fullName'} error={errors.fullName}
+                    />
+                  </motion.div>
                 )}
 
-                <InputField 
-                  icon={Mail} label="Email Address" name="email" placeholder="your@email.com"
-                  value={formData.email} onChange={handleInputChange} 
-                  onFocus={setFocusedField} onBlur={setFocusedField}
-                  focused={focusedField === 'email'} error={errors.email}
-                />
+                <motion.div variants={itemVariants}>
+                  <InputField 
+                    icon={Mail} label="Email Address" name="email" placeholder="your@email.com"
+                    value={formData.email} onChange={handleInputChange} 
+                    onFocus={setFocusedField} onBlur={setFocusedField}
+                    focused={focusedField === 'email'} error={errors.email}
+                  />
+                </motion.div>
 
                 {!isLogin && (
-                  <InputField 
-                    icon={Smartphone} label="Phone Number" name="phone" placeholder="+91 98765 43210"
-                    value={formData.phone} onChange={handleInputChange} 
-                    onFocus={setFocusedField} onBlur={setFocusedField}
-                    focused={focusedField === 'phone'} error={errors.phone}
-                  />
+                  <motion.div variants={itemVariants}>
+                    <InputField 
+                      icon={Smartphone} label="Phone Number" name="phone" placeholder="+91 98765 43210"
+                      value={formData.phone} onChange={handleInputChange} 
+                      onFocus={setFocusedField} onBlur={setFocusedField}
+                      focused={focusedField === 'phone'} error={errors.phone}
+                    />
+                  </motion.div>
                 )}
 
-                <InputField
-                  icon={Lock} label="Password" name="password" type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••" value={formData.password} onChange={handleInputChange}
-                  onFocus={setFocusedField} onBlur={setFocusedField}
-                  focused={focusedField === 'password'} error={errors.password}
-                  rightLabel={isLogin && <Link to="/forgot-password" style={s.forgotBtn}>Forgot Password?</Link>}
-                  rightElement={
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} style={s.eyeBtn}>
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  }
-                />
+                <motion.div variants={itemVariants}>
+                  <InputField
+                    icon={Lock} label="Password" name="password" type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••" value={formData.password} onChange={handleInputChange}
+                    onFocus={setFocusedField} onBlur={setFocusedField}
+                    focused={focusedField === 'password'} error={errors.password}
+                    rightLabel={isLogin && <Link to="/forgot-password" style={s.forgotBtn}>Forgot Password?</Link>}
+                    rightElement={
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} style={s.eyeBtn}>
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    }
+                  />
+                </motion.div>
 
-                <button type="submit" disabled={isLoading} style={s.submitBtn}>
+                <motion.button 
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.01, backgroundColor: '#C4955A' }}
+                  whileTap={{ scale: 0.99 }}
+                  type="submit" 
+                  disabled={isLoading} 
+                  style={s.submitBtn}
+                >
                   {isLoading ? 'PROCESSING...' : (
                     <>{isLogin ? 'SIGN IN' : 'CREATE ACCOUNT'} <ArrowRight size={16} /></>
                   )}
-                </button>
-              </form>
+                </motion.button>
+              </motion.form>
 
-              <p style={s.toggleText}>
+              <motion.p variants={itemVariants} style={s.toggleText}>
                 {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
                 <button onClick={() => setIsLogin(!isLogin)} style={s.toggleBtn}>
                   {isLogin ? 'Sign Up' : 'Sign In'}
                 </button>
-              </p>
+              </motion.p>
             </motion.div>
           </AnimatePresence>
         </div>
