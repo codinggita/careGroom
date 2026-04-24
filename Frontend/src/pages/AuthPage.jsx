@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useGoogleLogin } from '@react-oauth/google';
+import { signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '../../../Backend/src/config/firebase';
 import { Eye, EyeOff, Mail, Lock, User, Smartphone, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import spaAuthBg from '../assets/spa_auth_bg.png';
@@ -140,15 +141,17 @@ const AuthPage = () => {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
-  const loginWithGoogle = useGoogleLogin({
-    onSuccess: (codeResponse) => {
-      console.log('Google login success:', codeResponse);
-      setIsLoading(true);
-      // Here you would typically send the token to your backend
-      setTimeout(() => setIsLoading(false), 2000);
-    },
-    onError: (error) => console.log('Google Login Failed:', error)
-  });
+  const loginWithGoogle = async () => {
+    setIsLoading(true);
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log('Google login success:', result.user);
+    } catch (error) {
+      console.error('Google Login Failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const roles = [
     { key: 'client', label: 'Client' },
@@ -321,10 +324,11 @@ const AuthPage = () => {
               </motion.div>
 
               <motion.button
+                type="button"
                 variants={itemVariants}
                 whileHover={{ scale: 1.01, backgroundColor: '#F9F9F7' }}
                 whileTap={{ scale: 0.99 }}
-                onClick={() => loginWithGoogle()}
+                onClick={loginWithGoogle}
                 style={s.googleBtn}
               >
                 <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
